@@ -8,21 +8,10 @@ using namespace std;
 int parent[MAXV + 1] = {-1};
 
 
-
-struct edgenode
+struct adjacency_matrix
 {
-    int y;
-    int weight;
-    struct edgenode *next;
-};
-
-struct graph
-{
-    edgenode *edges[MAXV+1];
-    int degree[MAXV+1];
+    int weightMatrix[MAXV+1][MAXV+1];
     int nvertices;
-    int nedges;
-    bool directed; 
 };
 
 void initialize_graph(graph *g, bool directed)
@@ -30,30 +19,16 @@ void initialize_graph(graph *g, bool directed)
     int i;
 
     g -> nvertices = 0;
-    g -> nedges = 0;
-    g -> directed = directed;
-    for (i = 1; i<=MAXV; i++) g -> degree[i] = 0;
-    for (i = 1; i<=MAXV; i++) g -> edges[i] = NULL;
+    for(int i = 0; i < g->nvertices; i++){
+        for(int j = 0; j < g->nvertices; j++){
+            g->weightMatrix[i][j]=MAXINT;
+        }
+    }
 }
 
 void insert_edge(graph *g, int x, int y, int weight, bool directed)
 {
-    edgenode *p;
-    p = new edgenode;
-    p -> weight = weight;
-    p -> y = y;
-    p -> next = g -> edges[x];
-
-    g -> edges[x] = p;
-    g -> degree[x]++;
-    if (directed == false)
-    {
-        insert_edge(g, y, x, weight, true);
-    }
-    else
-    {
-        g -> nedges++;
-    }
+    g->weightMatrix[x][y] = weight;
 }
 
 
@@ -83,18 +58,55 @@ void read_graph(graph *g, bool directed)
 
 void print_graph(graph *g)
 {
-    int i;
     edgenode *p;
-    cout << "Vertex\tConnected " << endl;
-    for (i = 1; i <= g->nvertices; i++)
-    {
+    cout << "Adjacency matrix" << endl;
+    cout << '\t'
+    for(int i = 0; i < g->nvertices; i++){
         cout << i << "\t";
-        p = g -> edges[i];
-        while (p != NULL)
-        {
-            cout << p->y << "\t" ;
-            p = p -> next;
-        }
-        cout << endl;
     }
+    cout << endl;
+    for(int i = 0; i < g->nvertices; i++){
+        for(int j = 0; j < g->nvertices; j++){
+            if(j == 0){
+                cout << j << '\t' << weightMatrix[i][j] << '\t';
+            }
+            else {
+                cout << weightMatrix[i][j] << '\t';
+            }
+        }
+    }
+}
+
+void floyd (adjacency_matrix *g, int thread_count p){
+    int i, j;
+    int k;
+    int through_k;
+    int size_of_block = sqrt(p);
+    for(k = 0; k < g->nvertices; k++){
+        for(i = 0; i < g->nvertices; i++){
+            for(j = 0; j < g->nvertices; j++){
+                through_k = g->weightMatrix[i][k]+ g->weightMatrix[k][j];
+                if(through_k < g-> weightMatrix[i][j]){
+                    g->weightMatrix[i][j] = through_k;
+                }
+            }
+        }
+    }
+}
+
+int main(int argc, char const *argv[])
+{
+    graph g;
+    read_graph(&g, true);
+    print_graph(&g);
+    int p;
+    cout << "Enter the number of threads ";
+    cin >> p;
+    pthread_t threads[p];
+    int ret[p];
+    for(int i = 0; i < p; i++){
+        ret[p]= pthread_create()
+    }
+
+    return 0;
 }
